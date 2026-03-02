@@ -1,0 +1,6 @@
+*.zip
+*.csv
+backend/ml_model/
+node_modules/
+.env
+__pycache__/
