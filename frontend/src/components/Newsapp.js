@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Header from "./Header";
 
@@ -7,95 +7,138 @@ export default function Newsapp({ user }) {
   const [category, setCategory] = useState("business");
   const [viewSaved, setViewSaved] = useState(false);
 
-  useEffect(() => {
-    if (viewSaved) loadSaved();
-    else fetchCategory(category);
-  }, [category, viewSaved]);
+  /* ================== CALLBACKS ================== */
 
-  const fetchCategory = async (cat) => {
-    await axios.get(`https://newcontrol-1.onrender.com/api/fetch/${cat}`);
-    const res = await axios.get("https://newcontrol-1.onrender.com/api/news");
-    setNews(res.data);
-  };
+  const fetchCategory = useCallback(async (cat) => {
+    try {
+      await axios.get(
+        `https://newcontrol-1.onrender.com/api/fetch/${cat}`
+      );
+      const res = await axios.get(
+        "https://newcontrol-1.onrender.com/api/news"
+      );
+      setNews(res.data);
+    } catch (err) {
+      console.error("Fetch category error:", err);
+    }
+  }, []);
+
+  const loadSaved = useCallback(async () => {
+    try {
+      const res = await axios.get(
+        `https://newcontrol-1.onrender.com/api/saved/${user.id}`
+      );
+      setNews(res.data);
+    } catch (err) {
+      console.error("Load saved error:", err);
+    }
+  }, [user.id]);
+
+  /* ================== EFFECT ================== */
+
+  useEffect(() => {
+    if (viewSaved) {
+      loadSaved();
+    } else {
+      fetchCategory(category);
+    }
+  }, [category, viewSaved, fetchCategory, loadSaved]);
+
+  /* ================== ACTIONS ================== */
 
   const saveArticle = async (article) => {
-    await axios.post("https://newcontrol-1.onrender.com/api/save", {
-      user_id: user.id,
-      ...article,
-    });
-    alert("Article Saved ✅");
+    try {
+      await axios.post(
+        "https://newcontrol-1.onrender.com/api/save",
+        {
+          user_id: user.id,
+          ...article,
+        }
+      );
+      alert("Article Saved ✅");
+    } catch (err) {
+      alert("Error saving article");
+    }
   };
 
   const checkFake = async (article) => {
-  try {
-    const res = await axios.post("https://newcontrol-1.onrender.com/api/predict", {
-      text: article.title + " " + article.description,
-    });
+    try {
+      const res = await axios.post(
+        "https://newcontrol-1.onrender.com/api/predict",
+        {
+          text: article.title + " " + article.description,
+        }
+      );
 
-    alert(
-      `🧠 Fake News Detection Result\n\nPrediction: ${res.data.prediction}\nConfidence: ${res.data.confidence}%`
-    );
-  } catch (err) {
-    alert("AI Server Error — Make sure backend is running");
-  }
-};
+      alert(
+        `🧠 Fake News Detection Result\n\nPrediction: ${res.data.prediction}\nConfidence: ${res.data.confidence}%`
+      );
+    } catch (err) {
+      alert("AI Server Error — Make sure backend is running");
+    }
+  };
 
   const translateArticle = async (article) => {
-  const lang = prompt(
-    "Enter language code:\n\nhi = Hindi\nfr = French\nes = Spanish\nde = German\nar = Arabic\nja = Japanese",
-    "hi"
-  );
+    const lang = prompt(
+      "Enter language code:\n\nhi = Hindi\nfr = French\nes = Spanish\nde = German\nar = Arabic\nja = Japanese",
+      "hi"
+    );
 
-  if (!lang) return;
+    if (!lang) return;
 
-  try {
-    const res = await axios.post("https://newcontrol-1.onrender.com/api/translate", {
-      text: article.title + " " + article.description,
-      target: lang,
-    });
+    try {
+      const res = await axios.post(
+        "https://newcontrol-1.onrender.com/api/translate",
+        {
+          text: article.title + " " + article.description,
+          target: lang,
+        }
+      );
 
-    alert("🌍 Translated Text:\n\n" + res.data.translated);
-  } catch (err) {
-    alert("Translation Server Error");
-  }
-};
-
-  const loadSaved = async () => {
-    const res = await axios.get(`https://newcontrol-1.onrender.com/api/saved/${user.id}`);
-    setNews(res.data);
+      alert("🌍 Translated Text:\n\n" + res.data.translated);
+    } catch (err) {
+      alert("Translation Server Error");
+    }
   };
+
+  /* ================== UI ================== */
 
   return (
     <div className="news-page">
       <style>{css}</style>
 
-      <Header user={user} logout={() => {
-  localStorage.removeItem("user");
-  window.location.reload();
-}}
- />
-
- 
+      <Header
+        user={user}
+        logout={() => {
+          localStorage.removeItem("user");
+          window.location.reload();
+        }}
+      />
 
       {/* CATEGORY BAR */}
       <div className="category-bar">
         {!viewSaved &&
-          ["business", "sports", "technology", "health", "science"].map((cat) => (
-            <button
-              key={cat}
-              className={category === cat ? "active" : ""}
-              onClick={() => setCategory(cat)}
-            >
-              {cat.toUpperCase()}
-            </button>
-          ))}
+          ["business", "sports", "technology", "health", "science"].map(
+            (cat) => (
+              <button
+                key={cat}
+                className={category === cat ? "active" : ""}
+                onClick={() => setCategory(cat)}
+              >
+                {cat.toUpperCase()}
+              </button>
+            )
+          )}
 
-        <button className="saved-btn" onClick={() => setViewSaved(!viewSaved)}>
+        <button
+          className="saved-btn"
+          onClick={() => setViewSaved(!viewSaved)}
+        >
           {viewSaved ? "← Back to News" : "★ Saved Articles"}
         </button>
       </div>
 
-      {/* GRID */}
+      {/* NEWS GRID */}
       <div className="news-grid">
         {news.map((n, i) => (
           <div key={i} className="news-card">
@@ -111,18 +154,26 @@ export default function Newsapp({ user }) {
                 </a>
 
                 <div className="btn-group">
-  {!viewSaved && (
-    <button onClick={() => saveArticle(n)}>Save</button>
-  )}
+                  {!viewSaved && (
+                    <button onClick={() => saveArticle(n)}>
+                      Save
+                    </button>
+                  )}
 
-  <button className="fake-btn" onClick={() => checkFake(n)}>
-  🧠 Check Fake
-</button>
+                  <button
+                    className="fake-btn"
+                    onClick={() => checkFake(n)}
+                  >
+                    🧠 Check Fake
+                  </button>
 
-<button className="translate-btn" onClick={() => translateArticle(n)}>
-  🌍 Translate
-</button>
-</div>
+                  <button
+                    className="translate-btn"
+                    onClick={() => translateArticle(n)}
+                  >
+                    🌍 Translate
+                  </button>
+                </div>
               </div>
             </div>
           </div>
