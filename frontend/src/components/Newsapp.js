@@ -13,13 +13,13 @@ export default function Newsapp({ user }) {
   }, [category, viewSaved]);
 
   const fetchCategory = async (cat) => {
-    await axios.get(`http://127.0.0.1:5001/api/fetch/${cat}`);
-    const res = await axios.get("http://127.0.0.1:5001/api/news");
+    await axios.get(`https://newcontrol-1.onrender.com/api/fetch/${cat}`);
+    const res = await axios.get("https://newcontrol-1.onrender.com/api/news");
     setNews(res.data);
   };
 
   const saveArticle = async (article) => {
-    await axios.post("http://127.0.0.1:5001/api/save", {
+    await axios.post("https://newcontrol-1.onrender.com/api/save", {
       user_id: user.id,
       ...article,
     });
@@ -28,7 +28,7 @@ export default function Newsapp({ user }) {
 
   const checkFake = async (article) => {
   try {
-    const res = await axios.post("http://localhost:5001/api/predict", {
+    const res = await axios.post("https://newcontrol-1.onrender.com/api/predict", {
       text: article.title + " " + article.description,
     });
 
@@ -49,7 +49,7 @@ export default function Newsapp({ user }) {
   if (!lang) return;
 
   try {
-    const res = await axios.post("http://localhost:5001/api/translate", {
+    const res = await axios.post("https://newcontrol-1.onrender.com/api/translate", {
       text: article.title + " " + article.description,
       target: lang,
     });
@@ -61,7 +61,7 @@ export default function Newsapp({ user }) {
 };
 
   const loadSaved = async () => {
-    const res = await axios.get(`http://127.0.0.1:5001/api/saved/${user.id}`);
+    const res = await axios.get(`https://newcontrol-1.onrender.com/api/saved/${user.id}`);
     setNews(res.data);
   };
 

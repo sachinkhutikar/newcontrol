@@ -30,9 +30,9 @@ export default function Trending() {
   }, []);
 
   const fetchData = async () => {
-    const cat = await axios.get("http://localhost:5001/api/trending/categories");
-    const art = await axios.get("http://localhost:5001/api/trending/articles");
-    const st = await axios.get("http://localhost:5001/api/trending/stats");
+    const cat = await axios.get("https://newcontrol-1.onrender.com/api/trending/categories");
+    const art = await axios.get("https://newcontrol-1.onrender.com/api/trending/articles");
+    const st = await axios.get("https://newcontrol-1.onrender.com/api/trending/stats");
 
     setCategories(cat.data);
     setArticles(art.data);
