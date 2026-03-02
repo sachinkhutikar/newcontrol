@@ -24,6 +24,8 @@ export default function Newsapp({ user }) {
   }, []);
 
   const loadSaved = useCallback(async () => {
+    if (!user?.id) return; // 🔥 prevents crash
+
     try {
       const res = await axios.get(
         `https://newcontrol-1.onrender.com/api/saved/${user.id}`
@@ -32,7 +34,7 @@ export default function Newsapp({ user }) {
     } catch (err) {
       console.error("Load saved error:", err);
     }
-  }, [user.id]);
+  }, [user?.id]);
 
   /* ================== EFFECT ================== */
 
@@ -47,6 +49,11 @@ export default function Newsapp({ user }) {
   /* ================== ACTIONS ================== */
 
   const saveArticle = async (article) => {
+    if (!user?.id) {
+      alert("Please login first");
+      return;
+    }
+
     try {
       await axios.post(
         "https://newcontrol-1.onrender.com/api/save",
@@ -74,7 +81,7 @@ export default function Newsapp({ user }) {
         `🧠 Fake News Detection Result\n\nPrediction: ${res.data.prediction}\nConfidence: ${res.data.confidence}%`
       );
     } catch (err) {
-      alert("AI Server Error — Make sure backend is running");
+      alert("AI Server Error — Backend may be sleeping (Render free tier)");
     }
   };
 
@@ -182,6 +189,7 @@ export default function Newsapp({ user }) {
     </div>
   );
 }
+
 
 /* ---------------- CSS ---------------- */
 
