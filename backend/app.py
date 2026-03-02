@@ -72,6 +72,10 @@ def init_db():
 # =========================
 # FETCH NEWS FROM API
 # =========================
+@app.route("/")
+def home():
+    return "NewsControl Backend is running successfully 🚀"
+
 @app.route("/api/fetch/<category>")
 def fetch_news(category):
 
