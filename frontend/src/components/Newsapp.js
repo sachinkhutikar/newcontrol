@@ -69,23 +69,21 @@ export default function Newsapp({ user }) {
   };
 
   const checkFake = async (article) => {
-  try {
-    alert("⏳ Checking AI... please wait");
+    try {
+      const res = await axios.post(
+        "https://newcontrol-1.onrender.com/api/predict",
+        {
+          text: article.title + " " + article.description,
+        }
+      );
 
-    const res = await axios.post(
-      "https://newcontrol-1.onrender.com/api/predict",
-      {
-        text: article.title + " " + article.description,
-      }
-    );
-
-    alert(
-      `🧠 Fake News Detection Result\n\nPrediction: ${res.data.prediction}\nConfidence: ${res.data.confidence}%`
-    );
-  } catch (err) {
-    alert("⏳ Backend is waking up. Try again in 30 seconds.");
-  }
-};
+      alert(
+        `🧠 Fake News Detection Result\n\nPrediction: ${res.data.prediction}\nConfidence: ${res.data.confidence}%`
+      );
+    } catch (err) {
+      alert("Server waking up... Please wait 30 seconds and try again ⏳");
+    }
+  };
 
   const translateArticle = async (article) => {
     const lang = prompt(
