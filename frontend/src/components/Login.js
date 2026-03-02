@@ -12,7 +12,7 @@ export default function Login({ setUser, setRegister }) {
       return;
     }
 
-    const res = await axios.post("http://127.0.0.1:5001/api/login", {
+    const res = await axios.post("https://newcontrol-1.onrender.com/api/login", {
       username,
       password,
     });

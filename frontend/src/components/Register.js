@@ -11,7 +11,7 @@ export default function Register({ setRegister }) {
       return;
     }
 
-    const res = await axios.post("http://127.0.0.1:5001/api/register", {
+    const res = await axios.post("https://newcontrol-1.onrender.com/api/register", {
       username,
       password,
     });
