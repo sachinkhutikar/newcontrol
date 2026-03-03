@@ -70,18 +70,15 @@ export default function Newsapp({ user }) {
 
   const checkFake = async (article) => {
     try {
-      const res = await axios.post(
-        "https://newcontrol-1.onrender.com/api/predict",
-        {
-          text: article.title + " " + article.description,
-        }
-      );
-
+      const res = await axios.post("https://newcontrol-1.onrender.com/api/predict", {
+        text: article.title + " " + article.description,
+      });
+  
       alert(
         `🧠 Fake News Detection Result\n\nPrediction: ${res.data.prediction}\nConfidence: ${res.data.confidence}%`
       );
     } catch (err) {
-      alert("Server waking up... Please wait 30 seconds and try again ⏳");
+      alert("AI Server Error — Make sure backend is running");
     }
   };
 
