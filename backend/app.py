@@ -383,6 +383,6 @@ if __name__ == "__main__":
 
     init_db()
 
-    print("Server running on http://127.0.0.1:5001")
+    print("Server running on https://newcontrol-1.onrender.com")
 
     app.run(debug=True, port=5001)
